@@ -6,7 +6,7 @@ services:
     container_name: proxysql-mysql-replication-master
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: sbtest
     volumes:
       - ./master/my.cnf:/etc/mysql/my.cnf
       - ./master/data:/var/lib/mysql
@@ -19,9 +19,9 @@ services:
     container_name: proxysql-mysql-replication-slave1
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: sbtest
     volumes:
-      - ./slave/my.cnf:/etc/mysql/my.cnf
+      - ./slave/my-slave1.cnf:/etc/mysql/my.cnf
       - ./slave/data/slave1:/var/lib/mysql
       - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
@@ -34,9 +34,9 @@ services:
     container_name: proxysql-mysql-replication-slave2
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: app
+      MYSQL_DATABASE: sbtest
     volumes:
-      - ./slave/my.cnf:/etc/mysql/my.cnf
+      - ./slave/my-slave2.cnf:/etc/mysql/my.cnf
       - ./slave/data/slave2:/var/lib/mysql
       - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
@@ -45,14 +45,45 @@ services:
       - mysql-master
 
   proxysql:
-    image: proxysql/proxysql
+    image: proxysql/proxysql:2.0.12
     container_name: proxysql-mysql-replication-proxysql
     ports:
       - 6032:6032
       - 6033:6033
+      - 6080:6080
     volumes:
       - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
     depends_on:
       - mysql-master
       - mysql-slave1
       - mysql-slave2
+
+  mysqld-exporter-master:
+    image: prom/mysqld-exporter
+    container_name: proxysql-mysql-replication-mysqld-exporter-master
+    environment:
+      - DATA_SOURCE_NAME=exporter:password@(mysql-master:3306)/sbtest
+    depends_on:
+      - mysql-master
+    ports:
+      - 9104:9104
+
+  mysqld-exporter-slave1:
+    image: prom/mysqld-exporter
+    container_name: proxysql-mysql-replication-mysqld-exporter-slave1
+    environment:
+      - DATA_SOURCE_NAME=exporter:password@(mysql-slave1:3306)/sbtest
+    depends_on:
+      - mysql-slave1
+    ports:
+      - 9105:9104
+
+  mysqld-exporter-slave2:
+    image: prom/mysqld-exporter
+    container_name: proxysql-mysql-replication-mysqld-exporter-slave2
+    environment:
+      - DATA_SOURCE_NAME=exporter:password@(mysql-slave2:3306)/sbtest
+    depends_on:
+      - mysql-slave2
+    ports:
+      - 9106:9104

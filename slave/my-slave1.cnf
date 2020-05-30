@@ -5,20 +5,16 @@ datadir         = /var/lib/mysql
 secure-file-priv= NULL
 symbolic-links=0
 default_authentication_plugin=mysql_native_password
+lower_case_table_names = 1
 
 bind-address            = 0.0.0.0
 server-id               = 2
 relay-log               = /var/run/mysqld/mysql-relay-bin.log
 log_bin                 = /var/run/mysqld/mysql-bin.log
-binlog_do_db            = app
+binlog_do_db            = sbtest
 
 read_only = on
 
 gtid_mode                = on
 enforce_gtid_consistency = on
 log_slave_updates        = on
-
-# mysqlfailover
-report-host=node2
-report-port=3306
-master-info-repository=TABLE
