@@ -52,10 +52,6 @@ services:
       - 6033:6033
     volumes:
       - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
-    depends_on:
-      - mysql-master
-      - mysql-slave1
-      - mysql-slave2
 
   mysqld-exporter-master:
     image: prom/mysqld-exporter
@@ -93,14 +89,8 @@ services:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
-    depends_on:
-      - mysqld-exporter-master
-      - mysqld-exporter-slave1
-      - mysqld-exporter-slave2
 
   grafana:
     image: grafana/grafana
     ports:
       - 3000:3000
-    depends_on:
-      - prometheus
