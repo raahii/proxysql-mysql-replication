@@ -50,7 +50,6 @@ services:
     ports:
       - 6032:6032
       - 6033:6033
-      - 6080:6080
     volumes:
       - ./proxysql/proxysql.cnf:/etc/proxysql.cnf
     depends_on:

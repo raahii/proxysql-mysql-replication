@@ -1,5 +1,5 @@
 /* proxysql user */
-CREATE USER IF NOT EXISTS 'monitor'@'%' IDENTIFIED WITH sha256_password BY 'monitor';
+CREATE USER IF NOT EXISTS 'monitor'@'%' IDENTIFIED BY 'monitor';
 
 /* mysql exporter user */
 CREATE USER IF NOT EXISTS 'exporter'@'%' IDENTIFIED BY 'password' WITH MAX_USER_CONNECTIONS 3;
